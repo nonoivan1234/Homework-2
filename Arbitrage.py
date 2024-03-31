@@ -15,9 +15,9 @@ def return_money(orig, to, amount):
     if(orig == to):
         return amount
     try:
-       return amount * liquidity[(orig, to)][1] / liquidity[(orig, to)][0] / 1.003
+       return amount * liquidity[(orig, to)][1] * 0.997 / (liquidity[(orig, to)][0] + amount * 0.997)
     except:
-        return amount * liquidity[(to, orig)][0] / liquidity[(to, orig)][1] / 1.003
+        return amount * liquidity[(to, orig)][0] * 0.997 / (liquidity[(to, orig)][1] + amount * 0.997)
 
 tokens = ["tokenA", "tokenB", "tokenC", "tokenD", "tokenE"]
 
@@ -30,9 +30,10 @@ def find_profitable_path(start_token, initial_balance):
             stack.pop()
             continue
         token, path, balance = stack.pop()
-        if balance > 100 and token == "tokenB":
+        if balance > 20 and token == "tokenB":
             print(f"path: {'->'.join(path)}, tokenB balance={balance:.6f}")
-            return
+            return path
+        
         for next_token in tokens:
             if next_token == token:
                 continue
@@ -40,4 +41,9 @@ def find_profitable_path(start_token, initial_balance):
             stack.append((next_token, path + [next_token], new_balance))
 
 # Start the search with tokenB and an initial balance of 5
-find_profitable_path("tokenB", 5)
+path = find_profitable_path("tokenB", 5)
+
+# balance = 5
+# for i in range(len(path) - 1):
+#     balance = return_money(path[i], path[i + 1], balance)
+#     print(f"  {path[i]} -> {path[i + 1]}: {balance:.6f}")
